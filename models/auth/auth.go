@@ -16,10 +16,8 @@ package auth
 
 import (
 	"fmt"
-
 	"github.com/fatedier/frp/models/consts"
 	"github.com/fatedier/frp/models/msg"
-
 	"github.com/vaughan0/go-ini"
 )
 
@@ -97,6 +95,7 @@ type AuthServerConfig struct {
 	baseConfig
 	oidcServerConfig
 	tokenConfig
+	oauth2ServerConfig
 }
 
 func GetDefaultAuthServerConf() AuthServerConfig {
@@ -111,6 +110,7 @@ func UnmarshalAuthServerConfFromIni(conf ini.File) (cfg AuthServerConfig) {
 	cfg.baseConfig = unmarshalBaseConfFromIni(conf)
 	cfg.oidcServerConfig = unmarshalOidcServerConfFromIni(conf)
 	cfg.tokenConfig = unmarshalTokenConfFromIni(conf)
+	cfg.oauth2ServerConfig = unmarshalAuth2ConfFromIni(conf)
 	return cfg
 }
 
@@ -145,6 +145,8 @@ func NewAuthVerifier(cfg AuthServerConfig) (authVerifier Verifier) {
 		authVerifier = NewTokenAuth(cfg.baseConfig, cfg.tokenConfig)
 	case consts.OidcAuthMethod:
 		authVerifier = NewOidcAuthVerifier(cfg.baseConfig, cfg.oidcServerConfig)
+	case consts.Oauth2AuthMethod:
+		authVerifier = NewOAuth2Verifie(cfg.baseConfig, cfg.oauth2ServerConfig)
 	}
 
 	return authVerifier
